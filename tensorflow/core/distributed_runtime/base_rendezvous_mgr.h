@@ -16,6 +16,7 @@ limitations under the License.
 #ifndef TENSORFLOW_CORE_DISTRIBUTED_RUNTIME_BASE_RENDEZVOUS_MGR_H_
 #define TENSORFLOW_CORE_DISTRIBUTED_RUNTIME_BASE_RENDEZVOUS_MGR_H_
 
+#include <deque>
 #include <string>
 #include <unordered_set>
 
@@ -102,6 +103,7 @@ class BaseRendezvousMgr : public RendezvousMgrInterface {
   // Not owned.
   const WorkerEnv* const worker_env_;
 
+  std::deque<int64> steps_to_clean_ GUARDED_BY(mu_);
   mutex mu_;
   Table table_ GUARDED_BY(mu_);
 

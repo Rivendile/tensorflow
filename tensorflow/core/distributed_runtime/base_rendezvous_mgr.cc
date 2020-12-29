@@ -102,6 +102,19 @@ Status BaseRendezvousMgr::RecvLocal(int64 step_id,
 }
 
 void BaseRendezvousMgr::Cleanup(int64 step_id) {
+  // Delay the cleanup by 1024 steps for ByteScheduler
+  int64 step_to_clean;
+  {
+    mutex_lock l(mu_);
+    if (steps_to_clean_.size() >= 1024) {
+      step_to_clean = steps_to_clean_.front();
+      steps_to_clean_.pop_front();
+      steps_to_clean_.push_back(step_id);
+    } else {
+      steps_to_clean_.push_back(step_id);
+    }
+  }
+  step_id = step_to_clean;
   Rendezvous* rendez = nullptr;
   {
     mutex_lock l(mu_);
